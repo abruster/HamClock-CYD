@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/favicon.ico" rel="icon" type="image/x-icon">
+    <title>HamClock Configuration</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    
+    <!-- iro.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern Dark Theme */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        
+        /* Digital Display Font */
+        @font-face {
+            font-family: 'Digital7';
+            src: url('digital.ttf') format('truetype');
+        }
+        
+        @font-face {
+            font-family: 'Digital7Italic';
+            src: url('digitalitalic.ttf') format('truetype');
+        }
+        
+        /* Header */
+        .page-header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--accent-primary);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Cards */
+        .config-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        /* Time Display */
+        .time-container {
+            background: #000;
+            border: 4px solid var(--accent-primary);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            display: inline-block;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            min-width: 320px;
+            font-size: 4rem;  /* Font size directly on container */
+            font-family: 'Digital7', monospace;
+            color: var(--accent-secondary);
+            line-height: 1.1;
+        }
+        
+        .time-container:hover {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+        
+        .time-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Inputs */
+        input[type="number"] {
+            font-family: 'Digital7', monospace;
+            font-size: 2rem;  /* Changed from 2rem - adjust this value */
+            text-align: center;
+            width: 100%;
+            max-width: 250px;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: #000;
+            color: var(--accent-secondary);
+            -moz-appearance: textfield;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Form Controls */
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+        
+        .form-check-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        /* Range Sliders */
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* Weather Banner */
+        .weather-banner {
+            background: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .weather-banner-text {
+            animation: scrollText 15s linear infinite;
+            font-size: 1.5rem;  /* Changed from 1.5rem - adjust this value */
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+        
+        @keyframes scrollText {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Logo Selection */
+        .rounded-image-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .rounded-image-wrapper:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .rounded-image-wrapper.selected-image {
+            border-color: var(--accent-secondary);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .rounded-image-wrapper img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .selected-label {
+            color: var(--accent-secondary);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #2563eb 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-secondary) 0%, #059669 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+        
+        /* GitHub Logo */
+        .github-link {
+            transition: all 0.3s ease;
+        }
+        
+        .github-link:hover {
+            transform: rotate(360deg) scale(1.1);
+        }
+        
+        /* Color Picker Container */
+        .color-picker-container {
+            display: inline-block;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .time-display {
+                font-size: 2.5rem;
+            }
+            
+            input[type="number"] {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title text-center mb-0">HamClock Configuration</h1>
+        </div>
+    </div>
+    
+    <div class="container py-4">
+        <!-- Time Display Section -->
+        <div class="config-card">
+            <div class="row">
+                <div class="col-md-5 text-center mb-4 mb-md-0">
+                    <p class="time-label">Local Time</p>
+                    <div class="time-container" id="localTime">00:00:00</div>
+                    <div class="mt-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" id="line3" name="line" onclick="setColorTarget('localTimeDigits')" type="radio">
+                            <label class="form-check-label" for="line3">Digits</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" id="line4" name="line" onclick="setColorTarget('localTimeFrame')" type="radio">
+                            <label class="form-check-label" for="line4">Frame</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                    <a href="https://github.com/" target="_blank" class="github-link">
+                        <img alt="GitHub" src="github.png" style="width: 80px; height: auto;">
+                    </a>
+                </div>
+                
+                <div class="col-md-5 text-center">
+                    <p class="time-label">UTC Time</p>
+                    <div class="time-container" id="utcTime">00:00:00</div>
+                    <div class="mt-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" id="line5" name="line" onclick="setColorTarget('utcTimeDigits')" type="radio">
+                            <label class="form-check-label" for="line5">Digits</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" id="line6" name="line" onclick="setColorTarget('utcTimeFrame')" type="radio">
+                            <label class="form-check-label" for="line6">Frame</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6 text-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="thinBorderCheckbox" onclick="toggleBorderThickness()" type="checkbox">
+                        <label class="form-check-label" for="thinBorderCheckbox">Thin Border</label>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" id="italicFontsBorderCheckbox" onclick="sendItalicFontSetting()" type="checkbox">
+                        <label class="form-check-label" for="italicFontsBorderCheckbox">Italic Fonts</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weather Banner -->
+        <div class="config-card">
+            <h5 class="card-title">Weather Information Banner</h5>
+            <div class="weather-banner">
+                <div class="weather-banner-text" id="weatherBannerText">
+                    Loading weather data...
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" id="line7" name="line" onclick="setColorTarget('weatherBannerText')" type="radio">
+                    <label class="form-check-label" for="line7">Banner Text Color</label>
+                </div>
+            </div>
+            <div class="mt-3">
+                <label class="form-label text-muted">Scroll Speed</label>
+                <input id="speedSlider" max="45" min="0" step="1" type="range" value="22">
+            </div>
+        </div>
+        
+        <!-- Location & Color Picker -->
+        <div class="config-card">
+            <h5 class="card-title">Location & Colors</h5>
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    <label class="form-label">Latitude</label>
+                    <input id="latitudeInput" type="number" step="0.0001">
+                </div>
+                
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    <div class="color-picker-container" id="colorPicker"></div>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <label class="form-label">Longitude</label>
+                    <input id="longitudeInput" type="number" step="0.0001">
+                </div>
+            </div>
+        </div>
+
+        <!-- Station Information -->
+        <div class="config-card">
+            <h5 class="card-title">Station Information</h5>
+            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Optional fields for PSK Reporter integration</p>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Callsign (Optional)</label>
+                    <input type="text" class="form-control" id="callsignInput" placeholder="e.g., W1ABC" style="text-transform: uppercase;">
+                    <small class="text-muted">Leave blank to see all spots</small>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Maidenhead Grid (Optional)</label>
+                    <input type="text" class="form-control" id="gridInput" placeholder="e.g., EM17, EM17hn" maxlength="8" style="text-transform: uppercase;">
+                    <small class="text-muted">Accepts 4, 6, or 8 characters</small>
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Splash Images -->
+        <div class="config-card">
+            <h5 class="card-title">Select Startup Splash Screen</h5>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="rounded-image-wrapper" onclick="selectBootImage('logo1.png', this)">
+                        <img alt="Logo 1" src="logo1.png">
+                    </div>
+                    <p class="selected-label" style="display: none;">Selected</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="rounded-image-wrapper" onclick="selectBootImage('logo2.png', this)">
+                        <img alt="Logo 2" src="logo2.png">
+                    </div>
+                    <p class="selected-label" style="display: none;">Selected</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="rounded-image-wrapper" onclick="selectBootImage('logo3.png', this)">
+                        <img alt="Logo 3" src="logo3.png">
+                    </div>
+                    <p class="selected-label" style="display: none;">Selected</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="rounded-image-wrapper" onclick="selectBootImage('logo4.png', this)">
+                        <img alt="Logo 4" src="logo4.png">
+                    </div>
+                    <p class="selected-label" style="display: none;">Selected</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Screen Saver & Auto Page -->
+        <div class="config-card">
+            <h5 class="card-title">Display Settings</h5>
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <p class="form-label" id="screenSaverLabel">Screen Saver: 5 min</p>
+                </div>
+                <div class="col-md-5">
+                    <input id="screenSaverSlider" max="120" min="0" step="2" type="range" value="5">
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" id="autoPageChange" type="checkbox">
+                        <label class="form-check-label" for="autoPageChange">Auto Page Change</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Custom Image -->
+        <div class="config-card text-center">
+            <h5 class="card-title">Custom Splash Screen</h5>
+            <input accept="image/png" class="form-control d-none" id="imageUpload" type="file">
+            <button class="btn btn-success" id="uploadButton">
+                📤 Upload Custom Image (PNG 320x240)
+            </button>
+            <p class="text-muted mt-2" id="uploadStatus"></p>
+            <div class="mt-3" id="uploadSpinner" style="display: none;">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="text-muted mt-2">Uploading...</p>
+            </div>
+        </div>
+        
+        <!-- API Key Link -->
+        <div class="text-center mt-4">
+            <a class="btn btn-warning" href="/apikey.html" target="_blank">
+                🔑 Configure Weather API Key
+            </a>
+        </div>
+        
+        <!-- Hidden Save All Button -->
+        <div class="text-center mt-4" style="visibility: hidden;">
+            <button class="btn btn-primary" id="saveAllButton">
+                💾 Save All Settings
+            </button>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+    const labelIdToTarget = {
+        columnTitleLocalTime: "localTimeLabel",
+        columnTitleUTCtime: "utcTimeLabel"
+    };
+
+    let screenSaverSlider = document.getElementById("screenSaverSlider");
+    let screenSaverLabel = document.getElementById("screenSaverLabel");
+    let speedSlider = document.getElementById('speedSlider');
+    let weatherBannerText = document.getElementById('weatherBannerText');
+    let saveRebootModalInstance;
+    let currentDoubleFrame = false;
+
+    // Initialize iro.js color picker
+    const colorPicker = new iro.ColorPicker("#colorPicker", {
+        width: 200,
+        color: "#76c72a"
+    });
+
+    let currentTarget = 'localTimeDigits';
+
+    function setColorTarget(target) {
+        currentTarget = target;
+        console.log("Selected target: ", target);
+    }
+
+    colorPicker.on("color:change", function (color) {
+        const colorHex = color.hexString;
+
+        if (currentTarget === 'localTimeDigits') {
+            document.getElementById("localTime").style.color = colorHex;
+        } else if (currentTarget === 'localTimeFrame') {
+            document.getElementById("localTime").style.borderColor = colorHex;
+        } else if (currentTarget === 'utcTimeDigits') {
+            document.getElementById("utcTime").style.color = colorHex;
+        } else if (currentTarget === 'utcTimeFrame') {
+            document.getElementById("utcTime").style.borderColor = colorHex;
+        } else if (currentTarget === 'weatherBannerText') {
+            document.getElementById("weatherBannerText").style.color = colorHex;
+        }
+    });
+    
+    colorPicker.on("input:end", function (color) {
+        const colorHex = color.hexString;
+        const rgb565 = rgb565FromHex(colorHex);
+
+        fetch('/setcolor', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({target: currentTarget, color: rgb565})
+        }).then(response => {
+            if (!response.ok) throw new Error("Failed to send color");
+            console.log("✅ Color sent to ESP32:", currentTarget, colorHex);
+        }).catch(err => {
+            console.error("❌ Error sending color:", err);
+        });
+    });
+
+    function rgb565FromHex(hex) {
+        const r = parseInt(hex.substr(1, 2), 16);
+        const g = parseInt(hex.substr(3, 2), 16);
+        const b = parseInt(hex.substr(5, 2), 16);
+
+        const r5 = Math.round((r * 31) / 255) & 0x1F;
+        const g6 = Math.round((g * 63) / 255) & 0x3F;
+        const b5 = Math.round((b * 31) / 255) & 0x1F;
+
+        return (r5 << 11) | (g6 << 5) | b5;
+    }
+
+    function formatTime(date, useUTC = false) {
+        let hours = useUTC ? date.getUTCHours() : date.getHours();
+        let minutes = useUTC ? date.getUTCMinutes() : date.getMinutes();
+        let seconds = useUTC ? date.getUTCSeconds() : date.getSeconds();
+
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const formattedLocalTime = formatTime(now, false);
+        const formattedUtcTime = formatTime(now, true);
+
+        document.getElementById("localTime").innerText = formattedLocalTime;
+        document.getElementById("utcTime").innerText = formattedUtcTime;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    function toggleBorderThickness() {
+        const thinBorderCheckbox = document.getElementById("thinBorderCheckbox");
+
+        if (thinBorderCheckbox.checked) {
+            document.getElementById("localTime").style.borderWidth = "3px";
+            document.getElementById("utcTime").style.borderWidth = "3px";
+            currentDoubleFrame = false;
+        } else {
+            document.getElementById("localTime").style.borderWidth = "6px";
+            document.getElementById("utcTime").style.borderWidth = "6px";
+            currentDoubleFrame = true;
+        }
+    }
+
+    speedSlider.addEventListener('change', function () {
+        let sliderValue = parseInt(speedSlider.value);
+        // Slider: LEFT=0=slow, RIGHT=45=fast
+        // Animation: 0=30s (slow), 45=10s (fast)
+        let animationDuration = 30 - (sliderValue / 45) * 20;
+        weatherBannerText.style.animationDuration = animationDuration + 's';
+        
+        fetch('/setspeed', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({speed: sliderValue})  // Send raw slider value
+        }).then(response => {
+            if (!response.ok) throw new Error("Failed to send speed");
+            console.log("🚀 Speed updated on ESP32:", sliderValue);
+        }).catch(err => {
+            console.error("❌ Error sending speed:", err);
+        });
+    });
+
+    function selectBootImage(imageFilename, clickedImage) {
+        const rebootModal = new bootstrap.Modal(document.getElementById('rebootModal'));
+        document.getElementById('rebootLogoPreview').src = imageFilename;
+        rebootModal.show();
+
+        const allWrappers = document.querySelectorAll('.rounded-image-wrapper');
+        allWrappers.forEach(wrapper => {
+            wrapper.classList.remove('selected-image');
+            const label = wrapper.querySelector('.selected-label');
+            if (label) label.style.display = 'none';
+        });
+
+        const selectedWrapper = clickedImage.closest('.rounded-image-wrapper');
+        selectedWrapper.classList.add('selected-image');
+        const label = selectedWrapper.querySelector('.selected-label');
+        if (label) label.style.display = 'block';
+
+        localStorage.setItem('selectedBootImage', imageFilename);
+
+        fetch('/setbootimage', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({bootImageId: imageFilename})
+        }).catch(err => {
+            console.error("❌ Error saving boot image:", err);
+        });
+
+        const checkInterval = setInterval(() => {
+            fetch('/ping')
+                .then(res => {
+                    if (res.ok) {
+                        clearInterval(checkInterval);
+                        rebootModal.hide();
+                        console.log("🔄 Reloading page after boot image change...");
+                        location.reload();
+                    }
+                })
+                .catch(() => {});
+        }, 2000);
+    }
+
+    function updateScrollText() {
+        fetch("/scrolltext")
+            .then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.text();
+            })
+            .then(text => {
+                const banner = document.getElementById("weatherBannerText");
+                if (banner) {
+                    banner.innerText = text;
+                    console.log("📡 Scroll text updated:", text);
+                }
+            })
+            .catch(error => {
+                console.error("❌ Failed to fetch scroll text:", error);
+            });
+    }
+
+    function hexFrom565(rgb565) {
+        let r = ((rgb565 >> 11) & 0x1F) * 255 / 31;
+        let g = ((rgb565 >> 5) & 0x3F) * 255 / 63;
+        let b = (rgb565 & 0x1F) * 255 / 31;
+
+        r = Math.round(r);
+        g = Math.round(g);
+        b = Math.round(b);
+
+        return `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')}`;
+    }
+
+    function sendItalicFontSetting() {
+        const italic = document.getElementById("italicFontsBorderCheckbox").checked;
+
+        const newFont = italic ? "Digital7Italic" : "Digital7";
+        document.getElementById("localTime").style.fontFamily = newFont;
+        document.getElementById("utcTime").style.fontFamily = newFont;
+
+        fetch("/setitalic", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({italicClockFonts: italic})
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to update italicClockFonts");
+                console.log("✏️ italicClockFonts updated:", italic);
+            })
+            .catch(err => console.error("❌ Error updating italicClockFonts:", err));
+    }
+
+    function sendPositionUpdate() {
+        const latitude = document.getElementById("latitudeInput").value.trim();
+        const longitude = document.getElementById("longitudeInput").value.trim();
+
+        if (latitude !== '' && longitude !== '') {
+            fetch('/setposition', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({latitude, longitude})
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to update position");
+                    console.log(`🗺️ Position updated: lat=${latitude}, lon=${longitude}`);
+                    updateScrollText();
+                })
+                .catch(err => {
+                    console.error("❌ Error during position update:", err);
+                });
+        }
+    }
+
+    function sendCallsignUpdate() {
+        const callsign = document.getElementById("callsignInput").value.toUpperCase().trim();
+        const gridSquare = document.getElementById("gridInput").value.toUpperCase().trim();
+
+        // Validate grid square if provided
+        if (gridSquare !== '') {
+            const regex4 = /^[A-R]{2}[0-9]{2}$/;
+            const regex6 = /^[A-R]{2}[0-9]{2}[A-X]{2}$/;
+            const regex8 = /^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}$/;
+            
+            if (!regex4.test(gridSquare) && !regex6.test(gridSquare) && !regex8.test(gridSquare)) {
+                console.error("❌ Invalid grid square format, not saving");
+                return;
+            }
+        }
+
+        fetch('/setcallsign', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({callsign, gridSquare})
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to update callsign/grid");
+                console.log(`📻 Callsign/Grid updated: ${callsign || '(blank)'} / ${gridSquare || '(blank)'}`);
+            })
+            .catch(err => {
+                console.error("❌ Error during callsign/grid update:", err);
+            });
+    }
+
+
+    document.getElementById("saveAllButton").addEventListener("click", () => {
+        const config = {
+            latitude: parseFloat(document.getElementById("latitudeInput").value),
+            longitude: parseFloat(document.getElementById("longitudeInput").value),
+            italicClockFonts: document.getElementById("italicFontsBorderCheckbox").checked,
+            doubleFrame: currentDoubleFrame,
+            bannerSpeed: parseInt(document.getElementById("speedSlider").value),
+            screenSaverTimeout: parseInt(document.getElementById("screenSaverSlider").value) * 60000,
+            callsign: document.getElementById('callsignInput').value.toUpperCase().trim(),
+            gridSquare: document.getElementById('gridInput').value.toUpperCase().trim(),
+        };
+
+        saveRebootModalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById("saveRebootModal"));
+        saveRebootModalInstance.show();
+
+        fetch("/saveall", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(config)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to save");
+                console.log("✅ Settings saved, ESP32 is rebooting...");
+
+                let attempts = 0;
+                const maxRetries = 30;
+
+                const interval = setInterval(() => {
+                    fetch("/ping")
+                        .then(r => {
+                            if (r.ok) {
+                                clearInterval(interval);
+                                console.log("✅ ESP32 is back online!");
+                                
+                                saveRebootModalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById("saveRebootModal"));
+                                saveRebootModalInstance.hide();
+
+                                setTimeout(() => {
+                                    console.log("🔄 Reloading page after settings update...");
+                                    location.reload();
+                                }, 500);
+                            }
+                        })
+                        .catch(() => {});
+
+                    if (++attempts > maxRetries) {
+                        clearInterval(interval);
+                        saveRebootModalInstance.hide();
+                        alert("⚠️ ESP32 did not respond after reboot. Please refresh manually.");
+                    }
+                }, 2000);
+            })
+            .catch(err => {
+                console.error("❌ Save error:", err);
+                saveRebootModalInstance.hide();
+            });
+    });
+
+    document.getElementById("uploadButton").addEventListener("click", () => {
+        document.getElementById("imageUpload").click();
+    });
+
+    document.getElementById("imageUpload").addEventListener("change", () => {
+        const file = imageUpload.files[0];
+        const status = document.getElementById("uploadStatus");
+        const spinner = document.getElementById("uploadSpinner");
+
+        if (!file) return;
+
+        if (file.type !== "image/png") {
+            status.textContent = "❌ Only PNG files are allowed.";
+            return;
+        }
+
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+            if (img.width !== 320 || img.height !== 240) {
+                status.textContent = "❌ Image must be exactly 320x240.";
+                return;
+            }
+
+            spinner.style.display = "block";
+            status.textContent = "";
+
+            const formData = new FormData();
+            formData.append("file", file, "bootlogo.png");
+
+            fetch("/uploadpng", {
+                method: "POST",
+                body: formData,
+            })
+                .then(res => {
+                    spinner.style.display = "none";
+                    if (res.ok) {
+                        status.textContent = "✅ Upload successful!";
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        status.textContent = "⚠️ Upload may have succeeded (non-OK response)";
+                    }
+                })
+                .catch(err => {
+                    spinner.style.display = "none";
+                    status.textContent = "❌ Upload error: " + err.message;
+                });
+        };
+
+        img.onerror = () => {
+            status.textContent = "❌ Not a valid PNG image.";
+        };
+
+        img.src = objectUrl;
+    });
+
+    screenSaverSlider.addEventListener("input", () => {
+        const value = screenSaverSlider.value;
+        screenSaverLabel.innerText = `Screen Saver After: ${value} min.`;
+    });
+
+    screenSaverSlider.addEventListener("change", function () {
+        const minutes = parseInt(this.value);
+        const timeoutMs = minutes * 60000;
+
+        fetch('/setScreenSaverTime', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({screenSaverTimeout: timeoutMs})
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to send screen saver timeout");
+                console.log("🖥️ Screen Saver timeout sent to ESP32:", minutes, "minutes");
+            })
+            .catch(err => {
+                console.error("❌ Error sending screen saver timeout:", err);
+            });
+    });
+
+    document.getElementById("thinBorderCheckbox").addEventListener("change", function () {
+        const thin = this.checked;
+
+        fetch("/setcolor", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                target: "doubleFrame",
+                value: thin
+            })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to update doubleFrame");
+                console.log("✅ Border thickness updated:", thin ? "thin" : "thick");
+            })
+            .catch(err => {
+                console.error("❌ Error updating doubleFrame:", err);
+            });
+    });
+    
+    document.getElementById("autoPageChange").addEventListener("change", function () {
+        const change = this.checked;
+
+        fetch(`/setAutoPage?enabled=${change}`)
+            .then(response => response.text())
+            .then(data => console.log("ESP response:", data))
+            .catch(err => console.error("Error:", err));
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.groupCollapsed('🧭 HamClock UI Init');
+
+        const log = (...args) => console.log('🔹', ...args);
+        const warn = (...args) => console.warn('⚠️', ...args);
+        const err = (...args) => console.error('❌', ...args);
+
+        const getEl = (id) => {
+            const el = document.getElementById(id);
+            if (!el) warn(`Element #${id} not found`);
+            return el;
+        };
+
+        const els = {
+            saveRebootModal: getEl('saveRebootModal'),
+            latitudeInput: getEl('latitudeInput'),
+            longitudeInput: getEl('longitudeInput'),
+            callsignInput: getEl('callsignInput'),
+            gridInput: getEl('gridInput'),
+            italicFontsBorderCheckbox: getEl('italicFontsBorderCheckbox'),
+            thinBorderCheckbox: getEl('thinBorderCheckbox'),
+            localTime: getEl('localTime'),
+            utcTime: getEl('utcTime'),
+            speedSlider: getEl('speedSlider'),
+            weatherBannerText: getEl('weatherBannerText'),
+            screenSaverSlider: getEl('screenSaverSlider'),
+            screenSaverLabel: getEl('screenSaverLabel'),
+            autoPageChange: getEl('autoPageChange'),
+        };
+
+        let saveRebootModalInstance = null;
+        if (els.saveRebootModal && window.bootstrap?.Modal) {
+            saveRebootModalInstance = bootstrap.Modal.getOrCreateInstance(els.saveRebootModal);
+            log('Modal instance created');
+        } else {
+            warn('Bootstrap modal or #saveRebootModal not available');
+        }
+
+        const loadConfig = async () => {
+            log('Fetching /config...');
+            try {
+                const response = await fetch('/config');
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const config = await response.json();
+                console.groupCollapsed('📦 Config received');
+                console.table(config);
+                console.groupEnd();
+
+                if (!config.APIkeyIsValid) {
+                    const toastEl = document.getElementById('apiKeyToast');
+                    const toast = new bootstrap.Toast(toastEl, {delay: 2500});
+                    toast.show();
+
+                    setTimeout(() => {
+                        window.location.href = "/apikey.html";
+                    }, 2500);
+
+                    return;
+                }
+                
+                if (els.autoPageChange) {
+                    els.autoPageChange.checked = !!config.autoPageChange;
+                    log('Auto Page Change set to', !!config.autoPageChange);
+                }
+                
+                if (els.latitudeInput) els.latitudeInput.value = config.latitude ?? '';
+                if (els.longitudeInput) els.longitudeInput.value = config.longitude ?? '';
+                if (els.callsignInput) els.callsignInput.value = config.callsign ?? '';
+                if (els.gridInput) els.gridInput.value = config.gridSquare ?? '';
+
+                if (els.italicFontsBorderCheckbox) els.italicFontsBorderCheckbox.checked = !!config.italicClockFonts;
+                const newFont = config.italicClockFonts ? 'Digital7Italic' : 'Digital7';
+                if (els.localTime) els.localTime.style.fontFamily = newFont;
+                if (els.utcTime) els.utcTime.style.fontFamily = newFont;
+                log('Clock font set to', newFont);
+
+                if (els.thinBorderCheckbox) els.thinBorderCheckbox.checked = !config.doubleFrame;
+                if (typeof toggleBorderThickness === 'function') {
+                    toggleBorderThickness();
+                    log('Border thickness toggled (doubleFrame:', !!config.doubleFrame, ')');
+                }
+
+                if (els.speedSlider) {
+                    // Reverse-map: bannerSpeed is in ms (120=slow, 10=fast)
+                    // Slider is 0-45, HTML sends high on left, low on right
+                    const speedMs = Number(config.bannerSpeed ?? 50);
+                    const sliderValue = Math.round(((80 - speedMs) / 70) * 45);
+                    els.speedSlider.value = Math.max(0, Math.min(45, sliderValue));
+                }
+                if (els.weatherBannerText) {
+                    // Use slider value for animation: 0=30s (slow), 45=10s (fast)
+                    const sliderValue = Number(els.speedSlider?.value ?? 22);
+                    const animationDuration = 30 - (sliderValue / 45) * 20;
+                    els.weatherBannerText.style.animationDuration = animationDuration + 's';
+                    log('Banner speed set. Duration:', animationDuration + 's');
+
+                    if (typeof hexFrom565 === 'function') {
+                        els.weatherBannerText.style.color = hexFrom565(config.bannerColour ?? 0);
+                        log('Banner colour set to', hexFrom565(config.bannerColour ?? 0));
+                    }
+                }
+
+                if (els.screenSaverSlider) els.screenSaverSlider.value = config.screenSaverTimeout ?? 0;
+                if (els.screenSaverLabel) {
+                    const minutes = config.screenSaverTimeout ?? 0;
+                    els.screenSaverLabel.innerText = `Screen Saver After: ${minutes} min.`;
+                    log('Screen saver timeout set to', minutes, 'min');
+                }
+
+                if (config.startupLogo) {
+                    const sel = document.querySelector(`img[src="${config.startupLogo}"]`);
+                    if (sel && sel.parentElement) {
+                        sel.parentElement.classList.add('selected-image');
+                        sel.classList.add('selected-image');
+                        log('Startup logo selected:', config.startupLogo);
+                    }
+                }
+
+                if (typeof hexFrom565 === 'function') {
+                    if (els.localTime) {
+                        els.localTime.style.borderColor = hexFrom565(config.localFrameColour ?? 0);
+                        els.localTime.style.color = hexFrom565(config.localTimeColour ?? 0);
+                    }
+                    if (els.utcTime) {
+                        els.utcTime.style.borderColor = hexFrom565(config.utcFrameColour ?? 0);
+                        els.utcTime.style.color = hexFrom565(config.utcTimeColour ?? 0);
+                    }
+                    log('Colours applied to frames and text');
+                }
+
+            } catch (e) {
+                err('Error fetching config:', e);
+            }
+        };
+
+        const loadScrollText = async () => {
+            log('Fetching /scrolltext...');
+            try {
+                const response = await fetch('/scrolltext');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const text = await response.text();
+                if (els.weatherBannerText) els.weatherBannerText.innerHTML = text;
+                log('Scroll text loaded. Length:', text?.length ?? 0);
+            } catch (e) {
+                err('Error fetching scroll text:', e);
+            }
+        };
+
+        const wirePositionInputs = () => {
+            ['latitudeInput', 'longitudeInput'].forEach((key) => {
+                const el = els[key];
+                if (!el) return;
+                el.addEventListener('blur', () => {
+                    log(`${key} blur -> sendPositionUpdate()`);
+                    if (typeof sendPositionUpdate === 'function') sendPositionUpdate();
+                });
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        log(`Enter pressed on #${key} -> blur()`);
+                        el.blur();
+                    }
+                });
+            });
+            log('Position input events wired');
+        };
+
+        // Grid square validation function
+        const validateGridSquare = (grid) => {
+            grid = grid.toUpperCase().trim();
+            if (grid === '') return true; // Empty is okay (optional field)
+            
+            // Must be 4, 6, or 8 characters
+            if (grid.length !== 4 && grid.length !== 6 && grid.length !== 8) return false;
+            
+            // Format: AA##aa## (letters and numbers alternating)
+            const regex4 = /^[A-R]{2}[0-9]{2}$/;
+            const regex6 = /^[A-R]{2}[0-9]{2}[A-X]{2}$/;
+            const regex8 = /^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}$/;
+            
+            return regex4.test(grid) || regex6.test(grid) || regex8.test(grid);
+        };
+
+        const wireCallsignGridInputs = () => {
+            if (els.callsignInput) {
+                els.callsignInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+                
+                els.callsignInput.addEventListener('blur', () => {
+                    log('callsignInput blur -> sendCallsignUpdate()');
+                    if (typeof sendCallsignUpdate === 'function') sendCallsignUpdate();
+                });
+                
+                els.callsignInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        log('Enter pressed on callsignInput -> blur()');
+                        els.callsignInput.blur();
+                    }
+                });
+                
+                log('Callsign input wired with auto-save');
+            }
+            
+            if (els.gridInput) {
+                els.gridInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+                
+                els.gridInput.addEventListener('blur', function() {
+                    const grid = this.value.trim();
+                    if (grid !== '' && !validateGridSquare(grid)) {
+                        alert('Invalid Maidenhead Grid Square format!\nPlease use 4, 6, or 8 characters (e.g., EM17, EM17hn, EM17hn67)');
+                        this.focus();
+                    } else {
+                        log('gridInput blur -> sendCallsignUpdate()');
+                        if (typeof sendCallsignUpdate === 'function') sendCallsignUpdate();
+                    }
+                });
+                
+                els.gridInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        log('Enter pressed on gridInput -> blur()');
+                        els.gridInput.blur();
+                    }
+                });
+                
+                log('Grid input wired with validation and auto-save');
+            }
+        };
+
+        (async () => {
+            wirePositionInputs();
+            wireCallsignGridInputs();
+            await loadConfig();
+            await loadScrollText();
+            console.groupEnd();
+            log('✅ UI initialization complete');
+        })();
+    });
+    </script>
+    <!-- ADD THIS SECTION HERE -->
+    <div style="text-align:center; margin:40px 0; padding:20px;">
+        <a href="/" style="color:#3b82f6; text-decoration:none; font-weight:600; font-size:1.1rem; margin:0 15px;">
+            ← Back to Dashboard
+        </a>
+        <span style="color:#64748b;">|</span>
+        <a href="/apikey.html" style="color:#3b82f6; text-decoration:none; font-weight:600; font-size:1.1rem; margin:0 15px;">
+            ⚙️ Required Settings
+        </a>
+    </div>
+    <!-- Modals -->
+    <div class="modal fade" id="rebootModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+                <div class="modal-body text-center p-4">
+                    <img alt="Selected Logo" id="rebootLogoPreview" src="" style="width: 200px; border-radius: 12px; margin-bottom: 1rem;">
+                    <h5>Rebooting HamClock</h5>
+                    <p>Please wait while applying new splash screen...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="saveRebootModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+                <div class="modal-body text-center p-4">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <h5>Saving Settings</h5>
+                    <p>Rebooting to apply changes...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container position-fixed top-50 start-50 translate-middle p-3" style="z-index: 1100">
+        <div class="toast align-items-center text-bg-warning border-0" id="apiKeyToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ⚠️ No API key found. Redirecting to configuration...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

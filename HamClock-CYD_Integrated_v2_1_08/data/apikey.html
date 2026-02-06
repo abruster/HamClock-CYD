@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Required Settings - HamClock</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --accent-danger: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .required-notice {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--accent-danger);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .required-notice h3 {
+            margin: 0 0 10px 0;
+            color: var(--accent-danger);
+        }
+        
+        .form-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-section h2 {
+            color: var(--accent-primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .help-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: normal;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+        
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--accent-danger);
+            color: var(--accent-danger);
+        }
+        
+        .status-message.loading {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-secondary);
+        }
+        
+        .example-box {
+            background: var(--bg-tertiary);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .example-box strong {
+            color: var(--accent-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Required Settings</h1>
+        <div class="subtitle">Configure these settings to start using HamClock</div>
+        
+        <div class="required-notice">
+            <h3>⚠️ These Settings Are Required</h3>
+            <p>HamClock needs these settings to display weather and ISS tracking information.</p>
+        </div>
+        
+        <div id="status" class="status-message"></div>
+        
+        <div class="form-card">
+            <form id="settingsForm" onsubmit="saveSettings(event)">
+                <!-- Weather API Key Section -->
+                <div class="form-section">
+                    <h2><span class="section-icon">🌦️</span> OpenWeather API Key</h2>
+                    <label for="apikey">
+                        API Key
+                        <span class="help-text">Get your free API key at <a href="https://openweathermap.org/api" target="_blank" style="color: var(--accent-primary);">openweathermap.org/api</a></span>
+                    </label>
+                    <input type="text" 
+                           id="apikey" 
+                           name="key"
+                           placeholder="Enter your OpenWeather API key" 
+                           required>
+                </div>
+                
+                <!-- Location Section -->
+                <div class="form-section">
+                    <h2><span class="section-icon">📍</span> Your Location</h2>
+                    <p style="color: var(--text-muted); margin-top: 0; margin-bottom: 15px;">
+                        Required for weather and ISS pass predictions
+                    </p>
+                    
+                    <div class="input-group">
+                        <div>
+                            <label for="latitude">Latitude</label>
+                            <input type="number" 
+                                   id="latitude" 
+                                   name="latitude"
+                                   step="0.0001" 
+                                   placeholder="37.8003" 
+                                   required>
+                        </div>
+                        <div>
+                            <label for="longitude">Longitude</label>
+                            <input type="number" 
+                                   id="longitude" 
+                                   name="longitude"
+                                   step="0.0001" 
+                                   placeholder="-97.5250" 
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <strong>💡 How to find your coordinates:</strong><br>
+                        • Google Maps: Right-click your location → Click the coordinates<br>
+                        • Or use: <a href="https://www.latlong.net/" target="_blank" style="color: var(--accent-primary);">latlong.net</a>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="saveBtn">
+                    Save Required Settings
+                </button>
+            </form>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/settings">← Back to Settings</a>
+        </div>
+    </div>
+    
+    <script>
+        // Load current settings on page load
+        window.addEventListener('load', function() {
+            loadCurrentSettings();
+        });
+        
+        function loadCurrentSettings() {
+            fetch('/getApiKey')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.key) {
+                        document.getElementById('apikey').value = data.key;
+                        showStatus('✓ OpenWeather API key loaded', 'success');
+                    }
+                })
+                .catch(err => console.error('Error loading API key:', err));
+            
+            fetch('/config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.latitude && data.latitude !== 0) {
+                        document.getElementById('latitude').value = data.latitude;
+                    }
+                    if (data.longitude && data.longitude !== 0) {
+                        document.getElementById('longitude').value = data.longitude;
+                    }
+                    
+                    // Check if everything is loaded
+                    if (data.latitude !== 0 && data.longitude !== 0) {
+                        const currentStatus = document.getElementById('status');
+                        if (currentStatus.textContent.includes('OpenWeather')) {
+                            showStatus('✓ All settings loaded - you can update them if needed', 'success');
+                        } else {
+                            showStatus('✓ Location loaded', 'success');
+                        }
+                    }
+                })
+                .catch(err => console.error('Error loading config:', err));
+        }
+        
+        function saveSettings(event) {
+            event.preventDefault();
+            
+            const apiKey = document.getElementById('apikey').value.trim();
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            
+            // Validate inputs
+            if (!apiKey) {
+                showStatus('❌ Please enter an API key', 'error');
+                return;
+            }
+            
+            if (isNaN(latitude) || isNaN(longitude)) {
+                showStatus('❌ Please enter valid coordinates', 'error');
+                return;
+            }
+            
+            if (latitude < -90 || latitude > 90) {
+                showStatus('❌ Latitude must be between -90 and 90', 'error');
+                return;
+            }
+            
+            if (longitude < -180 || longitude > 180) {
+                showStatus('❌ Longitude must be between -180 and 180', 'error');
+                return;
+            }
+            
+            // Disable button during save
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            
+            showStatus('💾 Saving settings...', 'loading');
+            
+            // Save all settings in one request
+            const params = new URLSearchParams({
+                key: apiKey,
+                latitude: latitude,
+                longitude: longitude
+            });
+            
+            fetch('/saveApiKey?' + params.toString())
+                .then(response => response.text())
+                .then(data => {
+                    showStatus('✅ Settings saved! HamClock is starting...', 'success');
+                    
+                    // The ESP32 will reboot, so redirect after a delay
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                })
+                .catch(err => {
+                    showStatus('❌ Error saving settings. Please try again.', 'error');
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save Required Settings';
+                    console.error('Save error:', err);
+                });
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status-message ' + type;
+            status.style.display = 'block';
+            
+            // Auto-hide after 5 seconds for non-loading messages
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

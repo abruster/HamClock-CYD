@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISS Visible Passes - HamClock</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --accent-warning: #f59e0b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .info-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--accent-warning);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .warning-box h3 {
+            margin-top: 0;
+            color: var(--accent-warning);
+        }
+        
+        .api-key-form {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .help-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+        
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .metadata-item {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+        
+        .metadata-label {
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+        .metadata-value {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-primary);
+        }
+        
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .brightness {
+            font-weight: 700;
+        }
+        
+        .brightness.bright {
+            color: #fbbf24;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+            
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛰️ ISS Visible Passes</h1>
+        <div class="subtitle">International Space Station Predictions</div>
+        
+        <div id="api-key-notice" style="display:none;">
+            <div class="warning-box">
+                <h3>⚠️ N2YO API Key Required</h3>
+                <p>To view detailed ISS pass predictions, configure your N2YO API key below.</p>
+                <p>Get a free API key from <a href="https://www.n2yo.com/api/" target="_blank" style="color: var(--accent-primary);">https://www.n2yo.com/api/</a></p>
+                
+                <div class="api-key-form">
+                    <div class="form-group">
+                        <label for="n2yo-key">
+                            N2YO API Key
+                            <span class="help-text">Enter your N2YO API key (free registration required)</span>
+                        </label>
+                        <input type="text" id="n2yo-key" placeholder="Enter N2YO API key">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            Custom Location (Optional)
+                            <span class="help-text">Leave blank to use your main location</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="n2yo-lat" step="0.0001" placeholder="Latitude (optional)">
+                            <input type="number" id="n2yo-lon" step="0.0001" placeholder="Longitude (optional)">
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="saveN2YOKey()">Save API Key</button>
+                    <div id="save-status" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="passes-content">
+            <div class="info-box">
+                <div class="metadata" id="metadata"></div>
+            </div>
+            
+            <div class="info-box">
+                <h2 style="margin-top: 0; color: var(--accent-primary);">Upcoming Visible Passes</h2>
+                <div id="passes-table"></div>
+            </div>
+            
+            <div class="info-box">
+                <h3 style="color: var(--accent-primary);">Understanding ISS Passes</h3>
+                <p><strong>Brightness (Magnitude):</strong> Lower numbers = brighter. -2 to -4 are spectacular passes visible even in light-polluted areas.</p>
+                <p><strong>Elevation:</strong> Maximum height above horizon. 90° = directly overhead. Passes above 40° are excellent viewing opportunities.</p>
+                <p><strong>Direction:</strong> Where the ISS appears (Start) and disappears (End). Example: NW→SE means appears in northwest, travels to southeast.</p>
+                <p><strong>Duration:</strong> How long the pass lasts. Longer passes give more viewing time.</p>
+                <p><strong>Best Viewing:</strong> Look for passes with brightness better than 0.0 magnitude and elevation above 30°.</p>
+            </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">← Back to Dashboard</a>
+            <a href="/settings">⚙️ Settings</a>
+        </div>
+    </div>
+    
+    <script>
+        let hasApiKey = false;
+        
+        async function loadPassData() {
+            try {
+                const response = await fetch('/api/iss-passes');
+                const data = await response.json();
+                
+                // Check if API key is configured
+                hasApiKey = data.hasApiKey;
+                
+				// Always show the API key form (for editing)
+				document.getElementById('api-key-notice').style.display = 'block';
+				document.getElementById('passes-content').style.display = hasApiKey ? 'block' : 'none';
+
+				// If key exists, pre-populate the form
+				if (hasApiKey) {
+				loadN2YOSettings();
+				}                
+                // Display metadata
+                displayMetadata(data);
+                
+                // Display passes
+                if (data.hasData && data.passes && data.passes.length > 0) {
+                    displayPasses(data.passes);
+                } else {
+                    document.getElementById('passes-table').innerHTML = 
+                        '<p style="text-align:center; padding:40px; color:var(--text-muted);">No visible passes in the next 10 days. Check back later!</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading pass data:', error);
+                document.getElementById('passes-table').innerHTML = 
+                    '<p style="text-align:center; padding:40px; color:#ef4444;">Error loading pass predictions. Please try again.</p>';
+            }
+        }
+        
+        function displayMetadata(data) {
+            const metadata = document.getElementById('metadata');
+            const lastUpdate = new Date(data.lastUpdate * 1000);
+            
+            metadata.innerHTML = `
+                <div class="metadata-item">
+                    <span class="metadata-label">📍 Location</span>
+                    <span class="metadata-value">${data.latitude.toFixed(4)}°, ${data.longitude.toFixed(4)}°</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">🕐 Last Updated</span>
+                    <span class="metadata-value">${lastUpdate.toLocaleString()}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">🌍 Timezone</span>
+                    <span class="metadata-value">America/Chicago (Auto DST)</span>
+                </div>
+            `;
+        }
+        
+        function displayPasses(passes) {
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Brightness [Mag]</th>
+                            <th colspan="2">Start</th>
+                            <th colspan="2">Highest Point</th>
+                            <th colspan="2">End</th>
+                            <th>Duration</th>
+                            <th>Pass Type</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Time</th>
+                            <th>Az.</th>
+                            <th>Time</th>
+                            <th>Alt.</th>
+                            <th>Time</th>
+                            <th>Az.</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            passes.forEach(pass => {
+                const startDate = new Date(pass.startUTC * 1000);
+                const maxDate = new Date(pass.maxUTC * 1000);
+                const endDate = new Date(pass.endUTC * 1000);
+                
+                const brightness = pass.mag.toFixed(1);
+                const brightClass = pass.mag < -1.5 ? 'bright' : '';
+                
+                html += `
+                    <tr>
+                        <td>${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                        <td class="brightness ${brightClass}">${brightness}</td>
+                        <td>${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                        <td>${pass.startAzCompass}</td>
+                        <td>${maxDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                        <td>${pass.maxEl.toFixed(0)}°</td>
+                        <td>${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                        <td>${pass.endAzCompass}</td>
+                        <td>${Math.floor(pass.duration / 60)} min</td>
+                        <td>visible</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('passes-table').innerHTML = html;
+        }
+        
+        async function saveN2YOKey() {
+            const key = document.getElementById('n2yo-key').value.trim();
+            const lat = document.getElementById('n2yo-lat').value;
+            const lon = document.getElementById('n2yo-lon').value;
+            
+            if (!key) {
+                showStatus('Please enter an API key', 'error');
+                return;
+            }
+            
+            const params = new URLSearchParams({ key: key });
+            if (lat) params.append('latitude', lat);
+            if (lon) params.append('longitude', lon);
+            
+            try {
+                const response = await fetch('/saveN2YOApiKey?' + params.toString());
+                const result = await response.text();
+                
+                showStatus('✅ API Key saved! Rebooting to fetch passes...', 'success');
+                
+                setTimeout(() => {
+                    loadPassData();
+                }, 3000);
+                
+            } catch (error) {
+                showStatus('❌ Error saving API key', 'error');
+                console.error('Save error:', error);
+            }
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('save-status');
+            status.textContent = message;
+            status.className = 'status-message ' + type;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Load passes on page load
+        loadPassData();
+        
+        // Refresh every 5 minutes
+        setInterval(loadPassData, 300000);
+		async function loadN2YOSettings() {
+    try {
+        const response = await fetch('/getN2YOApiKey');
+        const data = await response.json();
+        
+        if (data.key) {
+            document.getElementById('n2yo-key').value = data.key;
+        }
+        if (data.latitude && data.latitude !== 0) {
+            document.getElementById('n2yo-lat').value = data.latitude;
+        }
+        if (data.longitude && data.longitude !== 0) {
+            document.getElementById('n2yo-lon').value = data.longitude;
+        }
+        
+        // Change the warning to show it's editable
+        const warningBox = document.querySelector('.warning-box h3');
+        if (data.key) {
+            warningBox.innerHTML = '⚙️ N2YO API Settings';
+            warningBox.parentElement.querySelector('p').innerHTML = 
+                'Your N2YO API key is configured. You can edit the settings below.';
+        }
+    } catch (error) {
+        console.error('Error loading N2YO settings:', error);
+    }
+}	
+    </script>
+</body>
+</html>

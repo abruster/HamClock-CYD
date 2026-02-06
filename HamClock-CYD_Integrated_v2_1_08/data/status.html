@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - HamClock</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-card h2 {
+            color: var(--accent-primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-indicator.good {
+            background: var(--accent-secondary);
+            box-shadow: 0 0 8px var(--accent-secondary);
+        }
+        
+        .status-indicator.bad {
+            background: var(--accent-danger);
+            box-shadow: 0 0 8px var(--accent-danger);
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .status-row:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            color: var(--text-muted);
+        }
+        
+        .status-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-secondary);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ System Status</h1>
+        <div class="subtitle">HamClock System Information</div>
+        
+        <div id="content">
+            <div class="loading">⏳ Loading system status...</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">← Back to Dashboard</a>
+            <a href="/settings">⚙️ Settings</a>
+        </div>
+    </div>
+    
+    <script>
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                showError('Failed to load system status. Please try again.');
+                console.error('Error:', error);
+            }
+        }
+        
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        function displayData(data) {
+            const html = `
+                <div class="status-grid">
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator ${data.wifi.connected ? 'good' : 'bad'}"></span>
+                            WiFi Connection
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value">${data.wifi.connected ? '✅ Connected' : '❌ Disconnected'}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">SSID</span>
+                            <span class="status-value">${data.wifi.ssid}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">IP Address</span>
+                            <span class="status-value">${data.wifi.ip}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Signal Strength</span>
+                            <span class="status-value">${data.wifi.rssi} dBm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator ${data.iss.valid ? 'good' : 'bad'}"></span>
+                            ISS Tracker
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value">${data.iss.valid ? '✅ Active' : '⏳ Waiting'}</span>
+                        </div>
+                        ${data.iss.valid ? `
+                        <div class="status-row">
+                            <span class="status-label">Latitude</span>
+                            <span class="status-value">${data.iss.latitude}°</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Longitude</span>
+                            <span class="status-value">${data.iss.longitude}°</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator ${data.solar.valid ? 'good' : 'bad'}"></span>
+                            Solar Data
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value">${data.solar.valid ? '✅ Active' : '⏳ Waiting'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator ${data.weather.valid ? 'good' : 'bad'}"></span>
+                            Weather Data
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value">${data.weather.valid ? '✅ Active' : '⏳ Waiting'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator ${data.psk.valid ? 'good' : 'bad'}"></span>
+                            PSK Reporter
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value">${data.psk.valid ? '✅ Active' : '⏳ Waiting'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <h2>
+                            <span class="status-indicator good"></span>
+                            System Information
+                        </h2>
+                        <div class="status-row">
+                            <span class="status-label">Uptime</span>
+                            <span class="status-value">${formatUptime(data.system.uptime)}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Free Heap</span>
+                            <span class="status-value">${formatBytes(data.system.freeHeap)}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Total Heap</span>
+                            <span class="status-value">${formatBytes(data.system.heapSize)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('content').innerHTML = html;
+        }
+        
+        function showError(message) {
+            document.getElementById('content').innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+        }
+        
+        // Load data when page loads
+        loadStatus();
+        
+        // Refresh every 30 seconds
+        setInterval(loadStatus, 30000);
+    </script>
+</body>
+</html>

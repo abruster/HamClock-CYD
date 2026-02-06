@@ -510,20 +510,13 @@ void DisplayManager::drawMainPage(bool wifiConnected, bool timeValid, const char
     }
   }
   
-  // Update ISS position every 30 seconds, but only if it moved significantly
-  if (millis() - lastISSUpdate > 30000) {
-    int x = map(issLon, -180, 180, 0, MAP_WIDTH-1);
-    int y = map(issLat, 90, -90, 0, MAP_HEIGHT-1);
-    
-    // Only redraw if moved more than 5 pixels (reduces slowdown from frequent redraws)
-    if (abs(x - _lastISSX) > 5 || abs(y - _lastISSY) > 5) {
-      drawISS(issLat, issLon, true);
-    }
+  // Update ISS position every 10 seconds
+  if (millis() - lastISSUpdate > 10000) {
+    drawISS(issLat, issLon, true);
     lastISSUpdate = millis();
   }
   
   // Draw band conditions panel with WiFi moved below PSK
-  _tft->setFreeFont(nullptr);
   drawBandConditions(solarData, timeValid);
   
   // Add WiFi status to band panel (below existing bands)
@@ -531,11 +524,11 @@ void DisplayManager::drawMainPage(bool wifiConnected, bool timeValid, const char
   _tft->setTextSize(1);
   if (wifiConnected) {
     _tft->setTextColor(TFT_GREEN, TFT_BLACK);
-    _tft->setCursor(panel_x + 55, 135);
+    _tft->setCursor(panel_x + 2, 135);
     _tft->print("WiFi");
   } else {
     _tft->setTextColor(TFT_RED, TFT_BLACK);
-    _tft->setCursor(panel_x + 55, 135);
+    _tft->setCursor(panel_x + 2, 135);
     _tft->print("WiFi");
   }
   
@@ -567,10 +560,21 @@ if (timeValid && (millis() - lastClockUpdate >= 100)) {  // 100ms gate — inner
   String localStr = String(localTime);
   
 //  Serial.printf("DEBUG: UTC=%s, Local=%s\n", utcStr.c_str(), localStr.c_str());
-
+  
   // Only redraw if time changed
   if (utcStr != lastUTCTime || localStr != lastLocalTime) {
-  
+    
+//    // ===== LOCAL CLOCK =====
+//    // Draw border (use doubleFrame from config)
+//    _tft->drawSmoothRoundRect(4, 151, 8, 5, 150, 43,
+//                              TFT_BLACK, TFT_BLACK);
+//                              
+//                           
+//    if (_config.doubleFrame) {
+//      _tft->drawSmoothRoundRect(2, 149, 8, 5, 154, 47, 
+//                                _config.localFrameColour, TFT_BLACK);
+//    }
+
 // ===== LOCAL CLOCK =====
     // Clear the border area first
 
@@ -660,7 +664,12 @@ if (timeValid && (millis() - lastClockUpdate >= 100)) {  // 100ms gate — inner
 // SCROLLING WEATHER BANNER
 // ============================================================================
 if (millis() - lastScrollUpdate >= _config.bannerSpeed) {
-  lastScrollUpdate = millis();
+  // Catch-up: if the loop was blocked (e.g. by an HTTP fetch), multiple
+  // ticks may have elapsed. Apply them all so the banner maintains its
+  // effective scroll speed rather than appearing to pause then resume.
+  unsigned long elapsed = millis() - lastScrollUpdate;
+  int ticks = elapsed / _config.bannerSpeed;
+  lastScrollUpdate += (unsigned long)ticks * _config.bannerSpeed;  // Preserve remainder
   
   // Declare strings at the top of the block
   String weatherText;
@@ -718,8 +727,8 @@ banner.print(weatherText);
 // Push sprite to screen
 banner.pushSprite(0, 208);
 
-// Update scroll position — always 1 pixel for smoothness
-scrollPosition -= 1;
+// Update scroll position using config — multiply by caught-up tick count
+scrollPosition -= _config.bannerPixelsPerFrame * ticks;
 
 // Calculate ACTUAL text width using the font
 int textWidth = banner.textWidth(weatherText);  // ← KEEP THIS ONE ONLY
@@ -728,6 +737,8 @@ int textWidth = banner.textWidth(weatherText);  // ← KEEP THIS ONE ONLY
 if (scrollPosition < -(textWidth + 50)) {
   scrollPosition = SCREEN_WIDTH;
 }
+
+
 
 }
 _tft->setFreeFont(nullptr);
@@ -875,6 +886,7 @@ void DisplayManager::drawPropagationPage(SolarIndices solarData, bool timeValid,
   _tft->setFreeFont(nullptr);
   _tft->setTextSize(1);
   
+
   // Determine if it's daytime
   bool isDay = true;
   if (timeValid) {
@@ -963,6 +975,9 @@ void DisplayManager::drawPropagationPage(SolarIndices solarData, bool timeValid,
     _tft->print(timeStr);  // Use pre-formatted string
   }
 
+
+
+
 }
 
 // ============================================================================
@@ -994,7 +1009,7 @@ void DisplayManager::drawSolarPage(SolarIndices solarData, bool timeValid, const
   
   int y = 40;
   int col1 = 20;
-  int col2 = 190;
+  int col2 = 180;
   
   // Solar Flux Index
   _tft->setTextColor(TFT_YELLOW, TFT_BLACK);
@@ -1087,15 +1102,14 @@ void DisplayManager::drawSolarPage(SolarIndices solarData, bool timeValid, const
   // Clear timestamp area and redraw
   _tft->fillRect(10, 220, 130, 15, TFT_BLACK);
   
-  // Clear data area and redraw
-  _tft->fillRect(188, 30, 110, 180, TFT_BLACK);
-  
   if (timeValid) {
     _tft->setTextColor(TFT_CYAN, TFT_BLACK);
     _tft->setCursor(10, 230);
     _tft->print(timeStr);  // Use pre-formatted string
   }
- 
+
+
+  
   _tft->setFreeFont(nullptr);
 }
 
@@ -1143,6 +1157,8 @@ void DisplayManager::drawPSKPage(PSKReporter* pskReporter, bool timeValid, const
       
       int y = 75;
       int displayedSpots = 0;
+
+
       
       // Find and display up to 10 spots from the most active band
       for (int i = 0; i < spotCount && displayedSpots < 10; i++) {
@@ -1492,6 +1508,10 @@ void DisplayManager::drawStatsPage(bool wifiConnected, bool timeValid, const cha
 //    }
   }
 
+
+
+
+
   // Clear bottom status area
   _tft->fillRect(210, 220, 110, 15, TFT_BLACK);
   
@@ -1504,6 +1524,8 @@ void DisplayManager::drawStatsPage(bool wifiConnected, bool timeValid, const cha
     _tft->setTextColor(TFT_RED, TFT_BLACK);
     _tft->print("WiFi: Disconnected");
   }
+
+
   
   _tft->setFreeFont(nullptr);
 }

@@ -1010,6 +1010,9 @@ void DisplayManager::drawSolarPage(SolarIndices solarData, bool timeValid, const
   int y = 40;
   int col1 = 20;
   int col2 = 180;
+
+  // Clear timestamp area and redraw
+  _tft->fillRect(10, 220, 130, 15, TFT_BLACK)
   
   // Solar Flux Index
   _tft->setTextColor(TFT_YELLOW, TFT_BLACK);
@@ -1098,9 +1101,6 @@ void DisplayManager::drawSolarPage(SolarIndices solarData, bool timeValid, const
   _tft->setTextColor(TFT_DARKGREY, TFT_BLACK);
   _tft->setCursor(col1 + 10, y);
   _tft->print("Negative = disturbed");
-  
-  // Clear timestamp area and redraw
-  _tft->fillRect(10, 220, 130, 15, TFT_BLACK);
   
   if (timeValid) {
     _tft->setTextColor(TFT_CYAN, TFT_BLACK);
